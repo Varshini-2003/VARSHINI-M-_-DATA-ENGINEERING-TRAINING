@@ -1,0 +1,98 @@
+1.use facultydb
+switched to db facultydb
+2.db.professors.insertMany([
+  {
+    name: "Dr. Kavita Iyer",
+    subject: "Mathematics",
+    experience: 10,
+    active: true
+  },
+  {
+    name: "Dr. Nikhil Sinha",
+    subject: "Physics",
+    experience: 5,
+    active: false
+  },
+  {
+    name: "Dr. Meera Das",
+    subject: "Chemistry",
+    experience: 8,
+    active: true
+  }
+])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('682c5cac4abcc71e37b2b1d4'),
+    '1': ObjectId('682c5cac4abcc71e37b2b1d5'),
+    '2': ObjectId('682c5cac4abcc71e37b2b1d6')
+  }
+}
+3.db.professors.find()
+{
+  _id: ObjectId('682c5cac4abcc71e37b2b1d4'),
+  name: 'Dr. Kavita Iyer',
+  subject: 'Mathematics',
+  experience: 10,
+  active: true
+}
+{
+  _id: ObjectId('682c5cac4abcc71e37b2b1d5'),
+  name: 'Dr. Nikhil Sinha',
+  subject: 'Physics',
+  experience: 5,
+  active: false
+}
+{
+  _id: ObjectId('682c5cac4abcc71e37b2b1d6'),
+  name: 'Dr. Meera Das',
+  subject: 'Chemistry',
+  experience: 8,
+  active: true
+}
+4.db.professors.find({ active: true })
+
+{
+  _id: ObjectId('682c5cac4abcc71e37b2b1d4'),
+  name: 'Dr. Kavita Iyer',
+  subject: 'Mathematics',
+  experience: 10,
+  active: true
+}
+{
+  _id: ObjectId('682c5cac4abcc71e37b2b1d6'),
+  name: 'Dr. Meera Das',
+  subject: 'Chemistry',
+  experience: 8,
+  active: true
+}
+
+5.db.professors.updateOne(
+  { subject: "Physics" },
+  { $set: { experience: 6 } }
+)
+
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+6.db.professors.updateOne(
+  { subject: "Physics" },
+  { $set: { active: true } }
+)
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+7.db.professors.deleteOne({ subject: "Chemistry" })
+{
+  acknowledged: true,
+  deletedCount: 1
+}
