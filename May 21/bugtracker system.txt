@@ -1,0 +1,65 @@
+1.relationaldb> use bugtracker
+switched to db bugtracker
+
+
+2.bugtracker> db.bugs.insertMany([
+...   {
+...     title: "Login button not responsive",
+...     reportedBy: "Alice",
+...     status: "open",
+...     priority: "high",
+...     createdAt: new Date()
+...   },
+...   {
+...     title: "Crash on settings page",
+...     reportedBy: "Bob",
+...     status: "in progress",
+...     priority: "medium",
+...     createdAt: new Date()
+...   },
+...   {
+...     title: "Typo in About Us page",
+...     reportedBy: "Test User",
+...     status: "closed",
+...     priority: "low",
+...     createdAt: new Date()
+...   }
+... ]);
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('682db3c4c532716f776c4bd4'),
+    '1': ObjectId('682db3c4c532716f776c4bd5'),
+    '2': ObjectId('682db3c4c532716f776c4bd6')
+  }
+}
+
+
+3.bugtracker> db.bugs.find({ status: "open", priority: "high" });
+[
+  {
+    _id: ObjectId('682db3c4c532716f776c4bd4'),
+    title: 'Login button not responsive',
+    reportedBy: 'Alice',
+    status: 'open',
+    priority: 'high',
+    createdAt: ISODate('2025-05-21T11:06:44.295Z')
+  }
+]
+
+
+4.bugtracker> db.bugs.updateOne(
+...   { title: "Login button not responsive" },
+...   { $set: { status: "closed" } }
+... );
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+
+5.bugtracker> db.bugs.deleteOne({ reportedBy: "Test User" });
+{ acknowledged: true, deletedCount: 1 }
