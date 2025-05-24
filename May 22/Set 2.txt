@@ -1,0 +1,417 @@
+Section 1: Basic Document Modeling & Insertion
+
+
+
+1.academia> use taskmanager
+switched to db taskmanager
+2.taskmanager> db.users.insertMany([
+...   { name: "Alice", email: "alice@example.com", role: "admin", active: true },
+...   { name: "Bob", email: "bob@example.com", role: "manager", active: true },
+...   { name: "Charlie", email: "charlie@example.com", role: "developer", active: trtrue }
+... ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6831607a304cc789656c4bdc'),
+    '1': ObjectId('6831607a304cc789656c4bdd'),
+    '2': ObjectId('6831607a304cc789656c4bde')
+  }
+}
+taskmanager> const alice = db.users.findOne({ name: "Alice" });
+
+taskmanager> const bob = db.users.findOne({ name: "Bob" });
+
+
+3.taskmanager> db.projects.insertMany([
+...   {
+...     title: "Website Redesign",
+...     description: "Redesign the company website.",
+...     startDate: new Date(),
+...     status: "active",
+...     createdBy: { _id: alice._id, name: alice.name }
+...   },
+...   {
+...     title: "Mobile App",
+...     description: "Develop a mobile application.",
+...     startDate: new Date(),
+...     status: "completed",
+...     createdBy: { _id: bob._id, name: bob.name }
+...   }
+... ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6831608d304cc789656c4bdf'),
+    '1': ObjectId('6831608d304cc789656c4be0')
+  }
+}
+taskmanager> const charlie = db.users.findOne({ name: "Charlie" });
+
+taskmanager> const project1 = db.projects.findOne({ title: "Website Redesign" });
+
+taskmanager> const project2 = db.projects.findOne({ title: "Mobile App" });
+
+
+4.taskmanager> db.tasks.insertMany([
+...   {
+...     title: "Design mockups",
+...     assignedTo: charlie._id,
+...     projectId: project1._id,
+...     priority: "high",
+...     dueDate: new Date("2025-06-01"),
+...     status: "in-progress"
+...   },
+...   {
+...     title: "Set up database",
+...     assignedTo: charlie._id,
+...     projectId: project1._id,
+...     priority: "medium",
+...     dueDate: new Date("2025-06-10"),
+...     status: "not-started"
+...   },
+...   {
+...     title: "Develop API",
+...     assignedTo: charlie._id,
+...     projectId: project2._id,
+...     priority: "high",
+...     dueDate: new Date("2025-06-15"),
+...     status: "in-progress"
+...   },
+...   {
+...     title: "Testing",
+...     assignedTo: bob._id,
+...     projectId: project2._id,
+...     priority: "low",
+...     dueDate: new Date("2025-06-20"),
+...     status: "not-started"
+...   },
+...   {
+...     title: "Deployment",
+...     assignedTo: alice._id,
+...     projectId: project2._id,
+...     priority: "high",
+...     dueDate: new Date("2025-06-25"),
+...     status: "not-started"
+...   }
+... ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6831609b304cc789656c4be1'),
+    '1': ObjectId('6831609b304cc789656c4be2'),
+    '2': ObjectId('6831609b304cc789656c4be3'),
+    '3': ObjectId('6831609b304cc789656c4be4'),
+    '4': ObjectId('6831609b304cc789656c4be5')
+  }
+}
+
+
+
+
+Section 2: Filtering & Querying
+
+5.taskmanager> db.tasks.find({ priority: "high", status: { $ne: "completed" } })
+[
+  {
+    _id: ObjectId('6831609b304cc789656c4be1'),
+    title: 'Design mockups',
+    assignedTo: ObjectId('6831607a304cc789656c4bde'),
+    projectId: ObjectId('6831608d304cc789656c4bdf'),
+    priority: 'high',
+    dueDate: ISODate('2025-06-01T00:00:00.000Z'),
+    status: 'in-progress'
+  },
+  {
+    _id: ObjectId('6831609b304cc789656c4be3'),
+    title: 'Develop API',
+    assignedTo: ObjectId('6831607a304cc789656c4bde'),
+    projectId: ObjectId('6831608d304cc789656c4be0'),
+    priority: 'high',
+    dueDate: ISODate('2025-06-15T00:00:00.000Z'),
+    status: 'in-progress'
+  },
+  {
+    _id: ObjectId('6831609b304cc789656c4be5'),
+    title: 'Deployment',
+    assignedTo: ObjectId('6831607a304cc789656c4bdc'),
+    projectId: ObjectId('6831608d304cc789656c4be0'),
+    priority: 'high',
+    dueDate: ISODate('2025-06-25T00:00:00.000Z'),
+    status: 'not-started'
+  }
+]
+
+6.taskmanager> db.users.find({ role: "developer", active: true })
+[
+  {
+    _id: ObjectId('6831607a304cc789656c4bde'),
+    name: 'Charlie',
+    email: 'charlie@example.com',
+    role: 'developer',
+    active: true
+  }
+]
+
+7.taskmanager> db.tasks.find({ assignedTo: ObjectId("6831607a304cc789656c4bdc")})
+[
+  {
+    _id: ObjectId('6831609b304cc789656c4be5'),
+    title: 'Deployment',
+    assignedTo: ObjectId('6831607a304cc789656c4bdc'),
+    projectId: ObjectId('6831608d304cc789656c4be0'),
+    priority: 'high',
+    dueDate: ISODate('2025-06-25T00:00:00.000Z'),
+    status: 'not-started'
+  }
+]
+
+8.taskmanager> const thirtyDaysAgo = new Date();
+
+taskmanager> thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+1745474869313
+taskmanager>
+
+taskmanager> db.projects.find({ startDate: { $gte: thirtyDaysAgo } })
+taskmanager>
+  {
+    _id: ObjectId('6831608d304cc789656c4bdf'),
+    title: 'Website Redesign',
+    description: 'Redesign the company website.',
+    startDate: ISODate('2025-05-24T06:00:45.924Z'),
+    status: 'active',
+    createdBy: { _id: ObjectId('6831607a304cc789656c4bdc'), name: 'Alice' }
+  },
+  {
+    _id: ObjectId('6831608d304cc789656c4be0'),
+    title: 'Mobile App',
+    description: 'Develop a mobile application.',
+    startDate: ISODate('2025-05-24T06:00:45.924Z'),
+    status: 'completed',
+    createdBy: { _id: ObjectId('6831607a304cc789656c4bdd'), name: 'Bob' }
+  }
+]
+
+
+Section 3: Update Operations
+
+
+9.taskmanager> db.tasks.updateOne(
+...   { title: "Design mockups" },
+...   { $set: { status: "completed" } }
+... )
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+10.taskmanager> db.users.updateOne(
+...   { name: "Charlie" },
+...   { $set: { role: "teamLead" } }
+... )
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+11.taskmanager> db.tasks.updateOne(
+...   { title: "Design mockups" },
+...   { $set: { tags: ["urgent", "frontend"] } }
+... )
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+
+Section 4: Array and Subdocument Operations
+
+
+12.taskmanager> db.tasks.updateOne(
+...   { title: "Design mockups" },
+...   { $addToSet: { tags: "UI" } }
+... )
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+13.taskmanager> db.tasks.updateOne(
+...   { title: "Design mockups" },
+...   { $pull: { tags: "frontend" } }
+... )
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+14.taskmanager> db.projects.updateOne(
+...   { title: "Website Redesign" },
+...   { $inc: { progress: 10 } }
+... )
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+
+
+Section 5: Aggregation & Lookup
+
+15.taskmanager> db.tasks.aggregate([
+...   {
+...     $lookup: {
+...       from: "users",
+...       localField: "assignedTo",
+...       foreignField: "_id",
+...       as: "assignee"
+...     }
+...   },
+...   { $unwind: "$assignee" },
+...   {
+...     $project: {
+...       title: 1,
+...       assigneeName: "$assignee.name"
+...     }
+...   }
+... ])
+[
+  {
+    _id: ObjectId('6831609b304cc789656c4be1'),
+    title: 'Design mockups',
+    assigneeName: 'Charlie'
+  },
+  {
+    _id: ObjectId('6831609b304cc789656c4be2'),
+    title: 'Set up database',
+    assigneeName: 'Charlie'
+  },
+  {
+    _id: ObjectId('6831609b304cc789656c4be3'),
+    title: 'Develop API',
+    assigneeName: 'Charlie'
+  },
+  {
+    _id: ObjectId('6831609b304cc789656c4be4'),
+    title: 'Testing',
+    assigneeName: 'Bob'
+  },
+  {
+    _id: ObjectId('6831609b304cc789656c4be5'),
+    title: 'Deployment',
+    assigneeName: 'Alice'
+  }
+]
+16.taskmanager> db.tasks.aggregate([
+...   {
+...     $lookup: {
+...       from: "projects",
+...       localField: "projectId",
+...       foreignField: "_id",
+...       as: "project"
+...     }
+...   },
+...   { $unwind: "$project" },
+...   { $match: { "project.status": "active" } }
+... ])
+[
+  {
+    _id: ObjectId('6831609b304cc789656c4be1'),
+    title: 'Design mockups',
+    assignedTo: ObjectId('6831607a304cc789656c4bde'),
+    projectId: ObjectId('6831608d304cc789656c4bdf'),
+    priority: 'high',
+    dueDate: ISODate('2025-06-01T00:00:00.000Z'),
+    status: 'completed',
+    tags: [ 'urgent', 'UI' ],
+    project: {
+      _id: ObjectId('6831608d304cc789656c4bdf'),
+      title: 'Website Redesign',
+      description: 'Redesign the company website.',
+      startDate: ISODate('2025-05-24T06:00:45.924Z'),
+      status: 'active',
+      createdBy: { _id: ObjectId('6831607a304cc789656c4bdc'), name: 'Alice' },
+      progress: 10
+    }
+  },
+  {
+    _id: ObjectId('6831609b304cc789656c4be2'),
+    title: 'Set up database',
+    assignedTo: ObjectId('6831607a304cc789656c4bde'),
+    projectId: ObjectId('6831608d304cc789656c4bdf'),
+    priority: 'medium',
+    dueDate: ISODate('2025-06-10T00:00:00.000Z'),
+    status: 'not-started',
+    project: {
+      _id: ObjectId('6831608d304cc789656c4bdf'),
+      title: 'Website Redesign',
+      description: 'Redesign the company website.',
+      startDate: ISODate('2025-05-24T06:00:45.924Z'),
+      status: 'active',
+      createdBy: { _id: ObjectId('6831607a304cc789656c4bdc'), name: 'Alice' },
+      progress: 10
+    }
+  }
+]
+17.taskmanager> db.tasks.aggregate([
+...   {
+...     $group: {
+...       _id: "$status",
+...       count: { $sum: 1 }
+...     }
+...   }
+... ])
+[
+  { _id: 'completed', count: 1 },
+  { _id: 'not-started', count: 3 },
+  { _id: 'in-progress', count: 1 }
+]
+18.taskmanager> db.tasks.aggregate([
+...   { $match: {} },
+...   { $sort: { dueDate: 1 } },
+...   { $limit: 3 }
+... ])
+[
+  {
+    _id: ObjectId('6831609b304cc789656c4be1'),
+    title: 'Design mockups',
+    assignedTo: ObjectId('6831607a304cc789656c4bde'),
+    projectId: ObjectId('6831608d304cc789656c4bdf'),
+    priority: 'high',
+    dueDate: ISODate('2025-06-01T00:00:00.000Z'),
+    status: 'completed',
+    tags: [ 'urgent', 'UI' ]
+  },
+  {
+    _id: ObjectId('6831609b304cc789656c4be2'),
+    title: 'Set up database',
+    assignedTo: ObjectId('6831607a304cc789656c4bde'),
+    projectId: ObjectId('6831608d304cc789656c4bdf'),
+    priority: 'medium',
+    dueDate: ISODate('2025-06-10T00:00:00.000Z'),
+    status: 'not-started'
+  },
+  {
+    _id: ObjectId('6831609b304cc789656c4be3'),
+    title: 'Develop API',
+    assignedTo: ObjectId('6831607a304cc789656c4bde'),
+    projectId: ObjectId('6831608d304cc789656c4be0'),
+    priority: 'high',
+    dueDate: ISODate('2025-06-15T00:00:00.000Z'),
+    status: 'in-progress'
+  }
+]
+
